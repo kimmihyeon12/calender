@@ -11,33 +11,33 @@ class _HomeState extends State<Home> {
   Map<DateTime, List<dynamic>> _events;
   List<dynamic> _selectedEvents;
   TextEditingController _eventController;
-  CalendarController _calendarController = CalendarController();
+
+  DateTime _selectedDay;
+
+  DateTime _focusedDay;
+  //CalendarController _calendarController = CalendarController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
       body: Center(
         child: Container(
-            height: 450,
-            width: 400,
+            height: 600,
             color: Colors.white,
             child: TableCalendar(
-              calendarStyle: CalendarStyle(
-                  canEventMarkersOverflow: true,
-                  todayColor: Colors.orange,
-                  selectedColor: Colors.pink,
-                  todayStyle: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18.0,
-                      color: Colors.white)),
+              firstDay: DateTime.utc(2010, 10, 16),
+              lastDay: DateTime.utc(2030, 3, 14),
+              focusedDay: DateTime.now(),
+
               locale: 'ko-KR',
 
-              calendarController: _calendarController,
-              events: _events,
+              // calendarController: _calendarController,
+              //  events: _events,
               availableGestures: AvailableGestures.all,
-              // onDaySelected: _onDaySelected,
-              builders: calendarBuilder(),
-              headerVisible: false,
+              //  onDaySelected: _onDaySelected,
+              //  builders: calendarBuilder(),
+              // headerVisible: false,
+              calendarBuilders: calendarBuilder(),
             )),
       ),
     );
@@ -63,15 +63,54 @@ class _HomeState extends State<Home> {
       // todayBuilder: (context, date, _) {
       //   return Container(color: Colors.pink);
       // },
-      markersBuilder: (context, date, events, holidays) {
-        Container(
-          margin: EdgeInsets.only(left: 35),
-          height: 20,
-          width: 20,
+      // markerBuilder:
+      // markerBuilder: (context, date, events, holidays) {
+      //   final children = <Widget>[];
+
+      //   if (events.isNotEmpty) {
+      //     children.add(
+      //       Positioned(
+      //         child: _buildEventsMarker(date, events),
+      //       ),
+      //     );
+      //   }
+
+      //   if (holidays.isNotEmpty) {
+      //     children.add(
+      //       Positioned(
+      //         right: -2,
+      //         top: -2,
+      //         child: _buildEventsMarker(date, events),
+      //       ),
+      //     );
+      //   }
+
+      //   return children;
+      // },
+
+      selectedBuilder: (context, date, events) => Container(
+        margin: const EdgeInsets.all(5.0),
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+            color: Colors.pink, //Theme.of(context).primaryColor,
+            borderRadius: BorderRadius.circular(8.0)),
+        child: Text(
+          date.day.toString(),
+          style: TextStyle(color: Colors.white),
+        ),
+      ),
+      todayBuilder: (context, date, events) => Container(
+        margin: const EdgeInsets.all(5.0),
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
           color: Colors.pink,
-          child: Center(child: Text("2")),
-        );
-      },
+          borderRadius: BorderRadius.circular(8.0),
+        ),
+        child: Text(
+          date.day.toString(),
+          style: TextStyle(color: Colors.white),
+        ),
+      ),
 
       // todayBuilder: (context, date, _) {
       //   return Container(
@@ -133,6 +172,22 @@ class _HomeState extends State<Home> {
       //   }
       //   return children;
       // },
+    );
+  }
+
+  Widget _buildEventsMarker(DateTime date, List events) {
+    print(date);
+    return Container(
+      margin: const EdgeInsets.all(5.0),
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: Color(0xffF86D37),
+        borderRadius: BorderRadius.circular(8.0),
+      ),
+      child: Text(
+        date.day.toString(),
+        style: TextStyle(color: Colors.white),
+      ),
     );
   }
 }
