@@ -59,7 +59,10 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
     final _selectedDay = DateTime.now();
 
     _events = {
-      _selectedDay.subtract(Duration(days: 30)): [
+      // subtract ~ day 일전
+      // add ~ day 일후
+
+      _selectedDay.subtract(Duration(days: 23)): [
         'Event A0',
       ],
       _selectedDay.subtract(Duration(days: 27)): ['Event A1'],
@@ -114,6 +117,8 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
 
   void _onDaySelected(DateTime day, List events, List holidays) {
     print('CALLBACK: _onDaySelected');
+    print(events);
+    displayBottomSheet(context);
     setState(() {
       _selectedEvents = events;
     });
@@ -132,57 +137,34 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Column(
-        mainAxisSize: MainAxisSize.max,
-        children: <Widget>[
-          // Switch out 2 lines below to play with TableCalendar's settings
-          //-----------------------
-          //_buildTableCalendar(),
-          _buildTableCalendarWithBuilders(),
-          const SizedBox(height: 8.0),
-          _buildButtons(),
-          const SizedBox(height: 8.0),
-          Expanded(child: _buildEventList()),
-        ],
+      resizeToAvoidBottomInset: false,
+      body: Container(
+        child: Column(
+          mainAxisSize: MainAxisSize.max,
+          children: <Widget>[
+            //고급 캘린더 띄워주기
+            const SizedBox(height: 50.0),
+            Center(
+              child: Container(
+                width: 400,
+                child: _buildTableCalendarWithBuilders(),
+              ),
+            ),
+
+            const SizedBox(height: 8.0),
+            // _buildButtons(),
+          ],
+        ),
       ),
     );
   }
 
-  // Simple TableCalendar configuration (using Styles)
-  // Widget _buildTableCalendar() {
-  //   return TableCalendar(
-  //     calendarController: _calendarController,
-  //     events: _events,
-  //     holidays: _holidays,
-  //     startingDayOfWeek: StartingDayOfWeek.monday,
-  //     calendarStyle: CalendarStyle(
-  //       selectedColor: Colors.deepOrange[400],
-  //       todayColor: Colors.deepOrange[200],
-  //       markersColor: Colors.brown[700],
-  //       outsideDaysVisible: false,
-  //     ),
-  //     headerStyle: HeaderStyle(
-  //       formatButtonTextStyle:
-  //           TextStyle().copyWith(color: Colors.white, fontSize: 15.0),
-  //       formatButtonDecoration: BoxDecoration(
-  //         color: Colors.deepOrange[400],
-  //         borderRadius: BorderRadius.circular(16.0),
-  //       ),
-  //     ),
-  //     onDaySelected: _onDaySelected,
-  //     onVisibleDaysChanged: _onVisibleDaysChanged,
-  //     onCalendarCreated: _onCalendarCreated,
-  //   );
-  // }
-
-  // More advanced TableCalendar configuration (using Builders & Styles)
+  //고급 캘린더 띄워주기
   Widget _buildTableCalendarWithBuilders() {
     print("current locale ${Localizations.localeOf(context).languageCode}");
     return TableCalendar(
-      locale: Localizations.localeOf(context).languageCode, //'pl_PL',
+      //언어설정
+      locale: 'ko-KR',
       calendarController: _calendarController,
       events: _events,
       holidays: _holidays,
@@ -196,11 +178,11 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
       },
       calendarStyle: CalendarStyle(
         outsideDaysVisible: false,
-        weekendStyle: TextStyle().copyWith(color: Colors.blue[800]),
+        weekendStyle: TextStyle().copyWith(color: Colors.pinkAccent),
         holidayStyle: TextStyle().copyWith(color: Colors.blue[800]),
       ),
       daysOfWeekStyle: DaysOfWeekStyle(
-        weekendStyle: TextStyle().copyWith(color: Colors.blue[600]),
+        weekendStyle: TextStyle().copyWith(color: Colors.pinkAccent),
       ),
       headerStyle: HeaderStyle(
         centerHeaderTitle: true,
@@ -208,14 +190,15 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
       ),
       builders: CalendarBuilders(
         selectedDayBuilder: (context, date, _) {
-          return FadeTransition(
-            opacity: Tween(begin: 0.0, end: 1.0).animate(_animationController),
-            child: Container(
-              margin: const EdgeInsets.all(4.0),
-              padding: const EdgeInsets.only(top: 5.0, left: 6.0),
-              color: Colors.deepOrange[300],
-              width: 100,
-              height: 100,
+          return AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.yellow[300],
+            ),
+            width: 50,
+            height: 50,
+            child: Center(
               child: Text(
                 '${date.day}',
                 style: TextStyle().copyWith(fontSize: 16.0),
@@ -224,15 +207,19 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
           );
         },
         todayDayBuilder: (context, date, _) {
-          return Container(
-            margin: const EdgeInsets.all(4.0),
-            padding: const EdgeInsets.only(top: 5.0, left: 6.0),
-            color: Colors.amber[400],
-            width: 100,
-            height: 100,
-            child: Text(
-              '${date.day}',
-              style: TextStyle().copyWith(fontSize: 16.0),
+          return AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.yellow[300],
+            ),
+            width: 50,
+            height: 50,
+            child: Center(
+              child: Text(
+                '${date.day}',
+                style: TextStyle().copyWith(fontSize: 16.0),
+              ),
             ),
           );
         },
@@ -275,18 +262,18 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
       decoration: BoxDecoration(
-        shape: BoxShape.rectangle,
+        shape: BoxShape.circle,
         color: _calendarController.isSelected(date)
-            ? Colors.brown[500]
+            ? Colors.pinkAccent
             : _calendarController.isToday(date)
-                ? Colors.brown[300]
-                : Colors.blue[400],
+                ? Colors.pinkAccent
+                : Colors.purple,
       ),
       width: 16.0,
       height: 16.0,
       child: Center(
         child: Text(
-          '${3}',
+          '${events.length}',
           style: TextStyle().copyWith(
             color: Colors.white,
             fontSize: 12.0,
@@ -304,56 +291,56 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildButtons() {
-    final dateTime = _events.keys.elementAt(_events.length - 2);
+  // Widget _buildButtons() {
+  //   final dateTime = _events.keys.elementAt(_events.length - 2);
 
-    return Column(
-      children: <Widget>[
-        Row(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: <Widget>[
-            RaisedButton(
-              child: Text('Month'),
-              onPressed: () {
-                setState(() {
-                  _calendarController.setCalendarFormat(CalendarFormat.month);
-                });
-              },
-            ),
-            RaisedButton(
-              child: Text('2 weeks'),
-              onPressed: () {
-                setState(() {
-                  _calendarController
-                      .setCalendarFormat(CalendarFormat.twoWeeks);
-                });
-              },
-            ),
-            RaisedButton(
-              child: Text('Week'),
-              onPressed: () {
-                setState(() {
-                  _calendarController.setCalendarFormat(CalendarFormat.week);
-                });
-              },
-            ),
-          ],
-        ),
-        const SizedBox(height: 8.0),
-        RaisedButton(
-          child: Text(
-              'Set day ${dateTime.day}-${dateTime.month}-${dateTime.year}'),
-          onPressed: () {
-            _calendarController.setSelectedDay(
-              DateTime(dateTime.year, dateTime.month, dateTime.day),
-              runCallback: true,
-            );
-          },
-        ),
-      ],
-    );
-  }
+  //   return Column(
+  //     children: <Widget>[
+  //       Row(
+  //         mainAxisSize: MainAxisSize.max,
+  //         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+  //         children: <Widget>[
+  //           RaisedButton(
+  //             child: Text('Month'),
+  //             onPressed: () {
+  //               setState(() {
+  //                 _calendarController.setCalendarFormat(CalendarFormat.month);
+  //               });
+  //             },
+  //           ),
+  //           RaisedButton(
+  //             child: Text('2 weeks'),
+  //             onPressed: () {
+  //               setState(() {
+  //                 _calendarController
+  //                     .setCalendarFormat(CalendarFormat.twoWeeks);
+  //               });
+  //             },
+  //           ),
+  //           RaisedButton(
+  //             child: Text('Week'),
+  //             onPressed: () {
+  //               setState(() {
+  //                 _calendarController.setCalendarFormat(CalendarFormat.week);
+  //               });
+  //             },
+  //           ),
+  //         ],
+  //       ),
+  //       const SizedBox(height: 8.0),
+  //       RaisedButton(
+  //         child: Text(
+  //             'Set day ${dateTime.day}-${dateTime.month}-${dateTime.year}'),
+  //         onPressed: () {
+  //           _calendarController.setSelectedDay(
+  //             DateTime(dateTime.year, dateTime.month, dateTime.day),
+  //             runCallback: true,
+  //           );
+  //         },
+  //       ),
+  //     ],
+  //   );
+  // }
 
   Widget _buildEventList() {
     return ListView(
@@ -372,5 +359,100 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
               ))
           .toList(),
     );
+  }
+
+  void displayBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+        barrierColor: Colors.transparent,
+        backgroundColor: Colors.white,
+        context: context,
+        builder: (ctx) {
+          return Container(
+            decoration: BoxDecoration(
+                color: Color(0xff2F343A),
+                border: Border.all(
+                  color: Color(0xff2F343A),
+                ),
+                borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(30),
+                    topRight: Radius.circular(30))),
+            child: Column(
+              children: [
+                SizedBox(height: 10),
+                Text(
+                  "할일",
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 25,
+                      fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 10),
+                Container(
+                  height: MediaQuery.of(context).size.height * 0.4,
+                  child: Center(
+                    child: _buildEventList(),
+                  ),
+                ),
+                Container(
+                  margin: EdgeInsets.only(left: 320),
+                  child: FloatingActionButton(
+                    onPressed: () async {
+                      print("다이얼로그 띄우기");
+                      await _showDialog();
+                    },
+                    child: Icon(
+                      Icons.add,
+                    ),
+                    backgroundColor: Colors.white,
+                    foregroundColor: Color(0xff2F343A),
+                  ),
+                ),
+              ],
+            ),
+          );
+        });
+  }
+
+  _showDialog() async {
+    final myController = TextEditingController();
+    return showDialog(
+        context: context,
+        //barrierDismissible - Dialog를 제외한 다른 화면 터치 x
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            // RoundedRectangleBorder - Dialog 화면 모서리 둥글게 조절
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.0)),
+            //Dialog Main Title
+            title: Column(
+              children: <Widget>[
+                new Text("Dialog Title"),
+              ],
+            ),
+            //
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                TextField(
+                  // controller: myController,
+                  onChanged: (text) {
+                    // 현재 텍스트필드의 텍스트를 출력
+                    print("First text field: $text");
+                  },
+                ),
+              ],
+            ),
+            actions: <Widget>[
+              new FlatButton(
+                child: new Text("확인"),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          );
+        });
   }
 }
