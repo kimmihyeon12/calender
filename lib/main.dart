@@ -62,7 +62,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
       // subtract ~ day 일전
       // add ~ day 일후
 
-      _selectedDay.subtract(Duration(days: 23)): [
+      _selectedDay.subtract(Duration(days: 23)).timeZoneOffset: [
         'Event A0',
       ],
       _selectedDay.subtract(Duration(days: 27)): ['Event A1'],
@@ -117,8 +117,15 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
 
   void _onDaySelected(DateTime day, List events, List holidays) {
     print('CALLBACK: _onDaySelected');
+    print(_events);
+    // print(events);
     print(events);
-    displayBottomSheet(context);
+    print(day.toUtc());
+
+    // List a = ['Event dd', 'Event aa'];
+    // _events[day] = a;
+
+    displayBottomSheet(context, day);
     setState(() {
       _selectedEvents = events;
     });
@@ -361,7 +368,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
     );
   }
 
-  void displayBottomSheet(BuildContext context) {
+  void displayBottomSheet(BuildContext context, day) {
     showModalBottomSheet(
         barrierColor: Colors.transparent,
         backgroundColor: Colors.white,
@@ -398,7 +405,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                   child: FloatingActionButton(
                     onPressed: () async {
                       print("다이얼로그 띄우기");
-                      await _showDialog();
+                      await _showDialog(day);
                     },
                     child: Icon(
                       Icons.add,
@@ -413,8 +420,9 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
         });
   }
 
-  _showDialog() async {
+  _showDialog(day) async {
     final myController = TextEditingController();
+
     return showDialog(
         context: context,
         //barrierDismissible - Dialog를 제외한 다른 화면 터치 x
@@ -436,11 +444,12 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 TextField(
-                  // controller: myController,
-                  onChanged: (text) {
-                    // 현재 텍스트필드의 텍스트를 출력
-                    print("First text field: $text");
-                  },
+                  controller: myController,
+
+                  // onChanged: (text) {
+                  //   // 현재 텍스트필드의 텍스트를 출력
+                  //   print("First text field: $text");
+                  // },
                 ),
               ],
             ),
@@ -448,7 +457,14 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
               new FlatButton(
                 child: new Text("확인"),
                 onPressed: () {
-                  Navigator.pop(context);
+                  print(myController.text.toString());
+                  print(day);
+                  List data = _events[day];
+                  print(data);
+                  // data.add(myController.text.toString());
+                  // _events[day] = data;
+
+                  //  Navigator.pop(context);
                 },
               ),
             ],
